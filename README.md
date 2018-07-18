@@ -14,7 +14,7 @@ I talked with Clemans, who was working on a more generic solution and he has imp
 https://github.com/clemensv/azure-relay-bridge
 
 ## Goal
-<<IMAGE>>
+![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Relay-Connect-To-SQL-PaaS-Without-Firewall-Rule/master/images/goal.png)
 
 ## Configuration
 1. Azure Relay
@@ -25,14 +25,14 @@ https://github.com/clemensv/azure-relay-bridge
 
 2. In the newly created relay click on "Hybrid Connections"
    - Click "+ Hybrid Connection" and name it: sqlhybridconnection
-   - <<createhybridconnection>>
+   - ![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Relay-Connect-To-SQL-PaaS-Without-Firewall-Rule/master/images/createhybridconnection.png)
 
 3. Click on the Hybrid Connection.
    - Click on Shared access policy
    - Create a policy and name it: sqlhybridpolicy
    - Select Listen and Send.
    - Press Create.
-   - <<sqlhybridpolicy>>
+   - ![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Relay-Connect-To-SQL-PaaS-Without-Firewall-Rule/master/images/sqlhybridpolicy.png)
 
 4. Click on the policy and copy the Primary Connection String
    - e.g. Endpoint=sb://sqldatabaserelay.servicebus.windows.net/;SharedAccessKeyName=sqlhybridpolicy;SharedAccessKey=<<REMOVED>>;EntityPath=sqlhybridconnection
@@ -54,7 +54,7 @@ https://github.com/clemensv/azure-relay-bridge
    - Allow Access to Azure Services: You can choose On or Off (I did Off since I just want my VNET to access)
    - Client IP Addresses: I left blank since I am trusting my VNET.
    - Click "Add existing virtual network".  Select the Virtual Network your Receiver VM is on
-   - <<sqlserverfirewall>>
+   - ![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Relay-Connect-To-SQL-PaaS-Without-Firewall-Rule/master/images/sqlserverfirewall.png)
 
  7. Client machine
    - You now need to configure your machine (or any other client)

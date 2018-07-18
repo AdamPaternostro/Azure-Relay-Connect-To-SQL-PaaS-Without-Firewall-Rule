@@ -6,7 +6,7 @@ Using Azure Relay for allowing access to SQL PaaS (and CosmosDB, and anything yo
 Customers have asked for a way where they can connect to SQL PaaS, but do not want to whitelist all their developers machines IP addresses.
 This is important since developers work from homes, airplanes, hotspots, etc.
 The goal is to allow the developer to securly connect to SQL PaaS without whitelisting their IP.
-This technique is not just limited to Azure SQL Database (juust about any resource can be enabled).
+This technique is not just limited to Azure SQL Database (just about any resource can be enabled).
 
 I saw a feature about Hybrid Connections that I through would be great, but it is very much tied to Azure App Services.
 See:  https://azure.microsoft.com/en-us/resources/videos/azure-app-service-with-hybrid-connections-to-on-premises-resources/
@@ -15,6 +15,8 @@ I talked with Clemens, who was working on a more generic solution he was working
 https://github.com/clemensv/azure-relay-bridge (This might move to the Azure repository in the future)
 
 ## Goal
+While the below diagram is my original goal, it turns out Azure Relay passes my client machine's IP address to SQL Database.  This defeats the point of the relay (from a firewall rule persepective).  But, we are in luck, since we can just allow the VNET the receiver machine is on access to SQL Database and we can connect.
+
 ![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Relay-Connect-To-SQL-PaaS-Without-Firewall-Rule/master/images/goal.png)
 
 ## Configuration
@@ -36,7 +38,7 @@ https://github.com/clemensv/azure-relay-bridge (This might move to the Azure rep
    - ![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Relay-Connect-To-SQL-PaaS-Without-Firewall-Rule/master/images/sqlhybridpolicy.png)
 
 4. Click on the policy and copy the Primary Connection String
-   - e.g. Endpoint=sb://sqldatabaserelay.servicebus.windows.net/;SharedAccessKeyName=sqlhybridpolicy;SharedAccessKey=<<REMOVED>>;EntityPath=sqlhybridconnection
+   - e.g. Endpoint=sb://sqldatabaserelay.servicebus.windows.net/;SharedAccessKeyName=sqlhybridpolicy;SharedAccessKey={REMOVED};EntityPath=sqlhybridconnection
 
 5. Create an Azure VM (aka "Reciever")
    - I created a Windows Server 2016 VM
@@ -57,12 +59,12 @@ https://github.com/clemensv/azure-relay-bridge (This might move to the Azure rep
    - Click "Add existing virtual network".  Select the Virtual Network your Receiver VM is on
    - ![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Relay-Connect-To-SQL-PaaS-Without-Firewall-Rule/master/images/sqlserverfirewall.png)
 
- 7. Client machine (Install)
+7. Client machine (Install)
    - You now need to configure your machine (or any other client)
    - Download the MSI from here: https://github.com/clemensv/azure-relay-bridge/releases  
    - Install the software.
    
- 8. Client machine (Configure hosts file)
+8. Client machine (Configure hosts file)
    - Open a cmd prompt (as administrator)
    - Open Notepad
    - Open C:\Windows\System32\drivers\etc\hosts
@@ -77,7 +79,7 @@ https://github.com/clemensv/azure-relay-bridge (This might move to the Azure rep
 Client
 ```
 cd "C:\Program Files\Azure Relay Bridge"
-azbridge -L 127.0.5.1:1433:sqlhybridconnection -x Endpoint=sb://sqldatabaserelay.servicebus.windows.net/;SharedAccessKeyName=sqlhybridpolicy;SharedAccessKey=<<REMOVED>>;EntityPath=sqlhybridconnection
+azbridge -L 127.0.5.1:1433:sqlhybridconnection -x Endpoint=sb://sqldatabaserelay.servicebus.windows.net/;SharedAccessKeyName=sqlhybridpolicy;SharedAccessKey={REMOVED};EntityPath=sqlhybridconnection
 
 Generic:
 azbridge -L 127.0.5.1:1433:{hybrid-connection-name} -x {SAS-Token}
@@ -86,12 +88,13 @@ azbridge -L 127.0.5.1:1433:{hybrid-connection-name} -x {SAS-Token}
 Receiver
 ```
 cd "C:\Program Files\Azure Relay Bridge"
-azbridge -R sqlhybridconnection:hdihiveserver.database.windows.net:1433 -x Endpoint=sb://sqldatabaserelay.servicebus.windows.net/;SharedAccessKeyName=sqlhybridpolicy;SharedAccessKey=<<REMOVED>>;EntityPath=sqlhybridconnection
+azbridge -R sqlhybridconnection:hdihiveserver.database.windows.net:1433 -x Endpoint=sb://sqldatabaserelay.servicebus.windows.net/;SharedAccessKeyName=sqlhybridpolicy;SharedAccessKey={REMOVED};EntityPath=sqlhybridconnection
 
 Generic:
 azbridge -R {hybrid-connection-name}:{sql-server-name}.database.windows.net:1433 -x {SAS-Token}
 ```
 
 ## Results
-Run SQL Server Management Studio and connect to your SQL Server "as normal"
+Run SQL Server Management Studio and connect to your SQL Server "as normal", but without whitelisting your IP address.
+
 ![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Relay-Connect-To-SQL-PaaS-Without-Firewall-Rule/master/images/results.png)

@@ -15,7 +15,7 @@ I talked with Clemens, who was working on a more generic solution he was working
 https://github.com/clemensv/azure-relay-bridge (This might move to the Azure repository in the future)
 
 ## Goal
-While the below diagram is my original goal, it turns out Azure Relay passes my client machine's IP address to SQL Database.  This defeats the point of the relay (from a firewall rule persepective).  But, we are in luck, since we can just allow the VNET the receiver machine is on access to SQL Database and we can connect.
+While the below diagram is my original goal, it turns out Azure Relay passes my client machine's IP address to SQL Database.  This defeats the point of the relay (from a firewall rule persepective).  But, we are in luck, since we can just allow the VNET the receiver machine is on, access to SQL Database and we can connect.
 
 ![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Relay-Connect-To-SQL-PaaS-Without-Firewall-Rule/master/images/goal.png)
 
@@ -51,7 +51,7 @@ While the below diagram is my original goal, it turns out Azure Relay passes my 
 
 6. Now create a SQL Database in Azure
    - You can use an existing one or create a new one.
-   - If you using an existing one the import step here is to set the firewall rules.
+   - If you using an existing database, the important step here is to set the firewall rules.
    - My database server is: hdihiveserver.database.windows.net
    - Click on the Firewall rules and set the following
    - Allow Access to Azure Services: You can choose On or Off (I did Off since I just want my VNET to access)
